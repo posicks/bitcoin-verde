@@ -6,8 +6,8 @@ import com.softwareverde.io.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class BatchedUpdateQuery extends Query {
-    public BatchedUpdateQuery(final String query) {
+public class BatchedInClauseQuery extends Query {
+    public BatchedInClauseQuery(final String query) {
         super(query);
     }
 

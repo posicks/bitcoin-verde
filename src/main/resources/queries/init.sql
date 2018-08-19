@@ -112,3 +112,11 @@ CREATE TABLE node_features (
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
 INSERT INTO metadata (version, timestamp) VALUES (1, UNIX_TIMESTAMP());
+
+CREATE TABLE _transaction_outputs (
+    id int(10) unsigned NOT NULL,
+    transaction_id int(10) unsigned NOT NULL,
+    `index` int(10) unsigned NOT NULL,
+    PRIMARY KEY (id),
+    KEY _transaction_outputs_ix (transaction_id,`index`) USING BTREE
+) ENGINE=MEMORY;

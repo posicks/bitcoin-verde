@@ -8,7 +8,9 @@ import com.softwareverde.bitcoin.server.Configuration;
 import com.softwareverde.bitcoin.server.Constants;
 import com.softwareverde.bitcoin.server.Environment;
 import com.softwareverde.bitcoin.server.database.TransactionDatabaseManager;
+import com.softwareverde.bitcoin.server.database.TransactionOutputDatabaseManager;
 import com.softwareverde.bitcoin.server.database.cache.AddressIdCache;
+import com.softwareverde.bitcoin.server.database.cache.CachedUnspentTransactionOutputDatabaseManager;
 import com.softwareverde.bitcoin.server.database.cache.TransactionIdCache;
 import com.softwareverde.bitcoin.server.message.BitcoinProtocolMessage;
 import com.softwareverde.bitcoin.server.module.node.handler.QueryBlockHeadersHandler;
@@ -97,6 +99,7 @@ public class NodeModule {
                     commandLineArguments.setInnoDbLogBufferByteCount(8 * ByteUtil.Unit.MEGABYTES);
                     commandLineArguments.setQueryCacheByteCount(0L);
                     commandLineArguments.setMaxAllowedPacketByteCount(32 * ByteUtil.Unit.MEGABYTES);
+                    commandLineArguments.addArgument("--max_heap_table_size=" + (6 * ByteUtil.Unit.GIGABYTES));
                     // commandLineArguments.enableSlowQueryLog("slow-query.log", 1L);
                     // commandLineArguments.addArgument("--performance_schema");
                     // commandLineArguments.addArgument("--general_log_file=query.log");
@@ -219,6 +222,10 @@ public class NodeModule {
         if (_shouldWarmUpCache) {
             Logger.log("[Warming Cache]");
             try (final MysqlDatabaseConnection databaseConnection = _environment.getDatabase().newConnection()) {
+                { // Load UTXOs into memory-table...
+                    CachedUnspentTransactionOutputDatabaseManager.loadCache(databaseConnection);
+                }
+
                 { // Warm Up AddressDatabaseManager Cache...
                     final AddressDatabaseManager addressDatabaseManager = new AddressDatabaseManager(databaseConnection);
                     final java.util.List<Row> rows = databaseConnection.query(
