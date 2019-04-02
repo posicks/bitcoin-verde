@@ -175,6 +175,18 @@ public class Main {
                 ChainValidationModule.execute(configurationFile, startingBlockHash);
             } break;
 
+            case "DATAFILE": {
+                if (_arguments.length < 2) {
+                    _printUsage();
+                    BitcoinUtil.exitFailure();
+                    break;
+                }
+
+                final String configurationFile = _arguments[1];
+                final String startingBlockHash = (_arguments.length > 2 ? _arguments[2] : "");
+                DatafileModule.execute(configurationFile, startingBlockHash);
+            } break;
+
             case "REPAIR": {
                 if (_arguments.length < 3) {
                     _printUsage();

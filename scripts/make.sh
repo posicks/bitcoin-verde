@@ -17,6 +17,7 @@ mkdir -p out/ssl
 
 # Create Database Directories
 mkdir -p out/data
+mkdir -p out/blocks
 mkdir -p out/tmp
 
 # Create Run-Scripts

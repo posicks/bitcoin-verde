@@ -40,6 +40,9 @@ public class Configuration {
 
         public Long getMaxMemoryByteCount() { return _maxMemoryByteCount; }
         public Boolean useEmbeddedDatabase() { return _useEmbeddedDatabase; }
+
+        public void setUseEmbeddedDatabase(final Boolean useEmbeddedDatabase) { _useEmbeddedDatabase = useEmbeddedDatabase; }
+        public void setMaxMemoryByteCount(final Long maxMemoryByteCount) { _maxMemoryByteCount = maxMemoryByteCount; }
     }
 
     public static class SeedNodeProperties {
