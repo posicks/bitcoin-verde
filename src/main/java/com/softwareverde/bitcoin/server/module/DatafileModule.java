@@ -4,7 +4,6 @@ import com.softwareverde.bitcoin.block.Block;
 import com.softwareverde.bitcoin.block.BlockDeflater;
 import com.softwareverde.bitcoin.block.BlockId;
 import com.softwareverde.bitcoin.block.header.BlockHeader;
-import com.softwareverde.bitcoin.block.header.BlockHeaderInflater;
 import com.softwareverde.bitcoin.chain.segment.BlockchainSegmentId;
 import com.softwareverde.bitcoin.chain.time.MutableMedianBlockTime;
 import com.softwareverde.bitcoin.hash.sha256.MutableSha256Hash;
@@ -29,7 +28,6 @@ import com.softwareverde.database.mysql.embedded.factory.ReadUncommittedDatabase
 import com.softwareverde.io.Logger;
 import com.softwareverde.network.time.MutableNetworkTime;
 import com.softwareverde.network.time.NetworkTime;
-import com.softwareverde.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -70,11 +68,11 @@ public class DatafileModule {
                 final MutableSha256Hash lastManifestHeaderHash = new MutableSha256Hash();
 
                 try (final FileInputStream manifestInputStream = new FileInputStream(manifestFile)) {
-                    manifestInputStream.skip(manifestFile.length() - BlockHeaderInflater.BLOCK_HEADER_BYTE_COUNT);
+                    manifestInputStream.skip(manifestFile.length() - Sha256Hash.BYTE_COUNT);
                     int index = 0;
                     int readByte;
                     while ((readByte = manifestInputStream.read()) >= 0) {
-                        if (index >= BlockHeaderInflater.BLOCK_HEADER_BYTE_COUNT) {
+                        if (index >= Sha256Hash.BYTE_COUNT) {
                             lastManifestHeaderHash.setBytes(BlockHeader.GENESIS_BLOCK_HASH);
                             break;
                         }
