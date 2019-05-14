@@ -4,8 +4,10 @@ import com.softwareverde.bitcoin.block.Block;
 import com.softwareverde.bitcoin.block.BlockDeflater;
 import com.softwareverde.bitcoin.block.BlockId;
 import com.softwareverde.bitcoin.block.header.BlockHeader;
+import com.softwareverde.bitcoin.block.header.BlockHeaderInflater;
 import com.softwareverde.bitcoin.chain.segment.BlockchainSegmentId;
 import com.softwareverde.bitcoin.chain.time.MutableMedianBlockTime;
+import com.softwareverde.bitcoin.hash.sha256.MutableSha256Hash;
 import com.softwareverde.bitcoin.hash.sha256.Sha256Hash;
 import com.softwareverde.bitcoin.server.Configuration;
 import com.softwareverde.bitcoin.server.Environment;
@@ -30,7 +32,9 @@ import com.softwareverde.network.time.NetworkTime;
 import com.softwareverde.util.Util;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class DatafileModule {
     public static void execute(final String configurationFileName, final String startingBlockHash) {
@@ -52,10 +56,41 @@ public class DatafileModule {
         return new Configuration(configurationFile);
     }
 
-    protected DatafileModule(final String configurationFilename, final String startingBlockHash) {
+    protected DatafileModule(final String configurationFilename, final String startingBlockHashString) {
         _configuration = _loadConfigurationFile(configurationFilename);
 
-        _startingBlockHash = Util.coalesce(Sha256Hash.fromHexString(startingBlockHash), BlockHeader.GENESIS_BLOCK_HASH);
+        final Sha256Hash startingBlockHash = Sha256Hash.fromHexString(startingBlockHashString);
+        if (startingBlockHash != null) {
+            _startingBlockHash = startingBlockHash;
+        }
+        else {
+            final File manifestFile = new File("blocks/MANIFEST");
+
+            if (manifestFile.exists() && manifestFile.length() > 0) {
+                final MutableSha256Hash lastManifestHeaderHash = new MutableSha256Hash();
+
+                try (final FileInputStream manifestInputStream = new FileInputStream(manifestFile)) {
+                    manifestInputStream.skip(manifestFile.length() - BlockHeaderInflater.BLOCK_HEADER_BYTE_COUNT);
+                    int index = 0;
+                    int readByte;
+                    while ((readByte = manifestInputStream.read()) >= 0) {
+                        if (index >= BlockHeaderInflater.BLOCK_HEADER_BYTE_COUNT) {
+                            lastManifestHeaderHash.setBytes(BlockHeader.GENESIS_BLOCK_HASH);
+                            break;
+                        }
+                        lastManifestHeaderHash.set(index, (byte) readByte);
+                        index += 1;
+                    }
+                }
+                catch (final IOException exception) {
+                    lastManifestHeaderHash.setBytes(BlockHeader.GENESIS_BLOCK_HASH);
+                }
+                _startingBlockHash = lastManifestHeaderHash;
+            }
+            else {
+                _startingBlockHash = BlockHeader.GENESIS_BLOCK_HASH;
+            }
+        }
 
         final Configuration.BitcoinProperties bitcoinProperties = _configuration.getBitcoinProperties();
         final Configuration.DatabaseProperties databaseProperties = bitcoinProperties.getDatabaseProperties();

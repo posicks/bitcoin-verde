@@ -183,7 +183,7 @@ public class Main {
                 }
 
                 final String configurationFile = _arguments[1];
-                final String startingBlockHash = (_arguments.length > 2 ? _arguments[2] : "");
+                final String startingBlockHash = (_arguments.length > 2 ? _arguments[2] : null);
                 DatafileModule.execute(configurationFile, startingBlockHash);
             } break;
 
