@@ -3,7 +3,6 @@ package com.softwareverde.bitcoin.server.module.node.sync;
 import com.softwareverde.bitcoin.block.Block;
 import com.softwareverde.bitcoin.block.BlockId;
 import com.softwareverde.bitcoin.block.header.BlockHeader;
-import com.softwareverde.bitcoin.block.header.BlockHeaderWithTransactionCount;
 import com.softwareverde.bitcoin.block.validator.BlockHeaderValidator;
 import com.softwareverde.bitcoin.chain.time.MutableMedianBlockTime;
 import com.softwareverde.bitcoin.hash.sha256.Sha256Hash;
@@ -143,7 +142,7 @@ public class BlockHeaderDownloader extends SleepyService {
         return true;
     }
 
-    protected void _processBlockHeaders(final List<BlockHeaderWithTransactionCount> blockHeaders) {
+    protected void _processBlockHeaders(final List<BlockHeader> blockHeaders) {
         final MilliTimer storeHeadersTimer = new MilliTimer();
         storeHeadersTimer.start();
 
@@ -199,7 +198,7 @@ public class BlockHeaderDownloader extends SleepyService {
 
         _downloadBlockHeadersCallback = new BitcoinNodeManager.DownloadBlockHeadersCallback() {
             @Override
-            public void onResult(final List<BlockHeaderWithTransactionCount> blockHeaders) {
+            public void onResult(final List<BlockHeader> blockHeaders) {
                 _processBlockHeaders(blockHeaders);
 
                 final Runnable newBlockHeaderAvailableCallback = _newBlockHeaderAvailableCallback;
