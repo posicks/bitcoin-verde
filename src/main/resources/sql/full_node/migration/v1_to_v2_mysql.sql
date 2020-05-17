@@ -14,7 +14,7 @@ CREATE TABLE validated_slp_transactions (
     UNIQUE KEY valid_slp_transactions_uq (transaction_id, blockchain_segment_id),
     FOREIGN KEY valid_slp_transactions_tx_id_fk (transaction_id) REFERENCES transactions (id) ON DELETE CASCADE,
     FOREIGN KEY valid_slp_transactions_blockchain_segment_id_fk (blockchain_segment_id) REFERENCES blockchain_segments (id)
-) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 PAGE_COMPRESSED=1 PAGE_COMPRESSION_LEVEL=9;
 
 INSERT INTO metadata (version, timestamp) VALUES (2, UNIX_TIMESTAMP());
 
